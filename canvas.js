@@ -14,13 +14,10 @@
 
   // ── Resize canvas to fill window ────────────────────────────────────────────
   function resize() {
-    // Preserve existing drawing when resizing
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    ctx.putImageData(imageData, 0, 0);
-    setDrawingStyle();
-  }
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  setDrawingStyle();
+}
 
   function setDrawingStyle() {
     ctx.strokeStyle = '#00ff99';

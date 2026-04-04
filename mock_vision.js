@@ -13,7 +13,7 @@ window.GazeEmitter = {
         this.onGaze({ x: e.clientX, y: e.clientY });
       }
     };
-    document.addEventListener('mousemove', this._handler);
+    window.addEventListener('mousemove', this._handler);
   },
 
   stop() {

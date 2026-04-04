@@ -54,17 +54,11 @@
   };
 
   recognition.onerror = (event) => {
-    console.error('[Voice] Error:', event.error);
-    // Auto-restart on common transient errors
-    if (event.error === 'no-speech' || event.error === 'network') {
-      recognition.stop();
-      setTimeout(() => recognition.start(), 1000);
-    }
+  console.error('[Voice] Error:', event.error);
   };
 
   recognition.onend = () => {
-    // Keep restarting so it stays always-on
-    recognition.start();
+  setTimeout(() => recognition.start(), 500);
   };
 
   // Start listening
