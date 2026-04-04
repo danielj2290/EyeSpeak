@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gaze Canvas</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #1a1a2e; color: #eee; font-family: sans-serif; overflow: hidden; }
+
+    #canvas-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #drawing-canvas {
+      display: block;
+      cursor: none;
+    }
+
+    /* Gaze cursor dot */
+    #gaze-cursor {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(255, 100, 100, 0.8);
+      border: 2px solid white;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: background 0.1s;
+    }
+
+    #gaze-cursor.drawing {
+      background: rgba(100, 255, 150, 0.9);
+    }
+
+    /* HUD overlay */
+    #hud {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .status-pill {
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    #mode-indicator {
+      background: rgba(255, 80, 80, 0.25);
+      border-color: rgba(255, 80, 80, 0.5);
+      color: #ff8080;
+    }
+
+    #mode-indicator.drawing {
+      background: rgba(80, 255, 120, 0.25);
+      border-color: rgba(80, 255, 120, 0.5);
+      color: #80ff90;
+    }
+
+    /* Voice feedback toast */
+    #voice-toast {
+      position: absolute;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 8px 20px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.7);
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    #voice-toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+<div id="canvas-container">
+  <canvas id="drawing-canvas"></canvas>
+  <div id="gaze-cursor"></div>
+
+  <div id="hud">
+    <div class="status-pill" id="mode-indicator">⬤ STOPPED</div>
+    <div class="status-pill" id="voice-status">🎤 Voice: off</div>
+  </div>
+
+  <div id="voice-toast"></div>
+</div>
+
+<!-- Swap these two lines when merging eye tracking -->
+<script src="mock_gaze.js"></script>
+<!-- <script src="real_gaze.js"></script> -->
+
+<script src="canvas.js"></script>
+<script src="voice.js"></script>
+
+</body>
+</html>
