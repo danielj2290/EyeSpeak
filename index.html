@@ -3,112 +3,198 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gaze Canvas</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #1a1a2e; color: #eee; font-family: sans-serif; overflow: hidden; }
-
-    #canvas-container {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-    }
-
-    #drawing-canvas {
-      display: block;
-      cursor: none;
-    }
-
-    /* Gaze cursor dot */
-    #gaze-cursor {
-      position: absolute;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: rgba(255, 100, 100, 0.8);
-      border: 2px solid white;
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      transition: background 0.1s;
-    }
-
-    #gaze-cursor.drawing {
-      background: rgba(100, 255, 150, 0.9);
-    }
-
-    /* HUD overlay */
-    #hud {
-      position: absolute;
-      top: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .status-pill {
-      padding: 6px 14px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      background: rgba(0,0,0,0.5);
-      border: 1px solid rgba(255,255,255,0.15);
-    }
-
-    #mode-indicator {
-      background: rgba(255, 80, 80, 0.25);
-      border-color: rgba(255, 80, 80, 0.5);
-      color: #ff8080;
-    }
-
-    #mode-indicator.drawing {
-      background: rgba(80, 255, 120, 0.25);
-      border-color: rgba(80, 255, 120, 0.5);
-      color: #80ff90;
-    }
-
-    /* Voice feedback toast */
-    #voice-toast {
-      position: absolute;
-      bottom: 32px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 8px 20px;
-      border-radius: 8px;
-      background: rgba(0,0,0,0.7);
-      font-size: 14px;
-      opacity: 0;
-      transition: opacity 0.3s;
-      pointer-events: none;
-    }
-
-    #voice-toast.visible {
-      opacity: 1;
-    }
-  </style>
+  <title>EyeSpeak — Medical Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://webgazer.cs.brown.edu/webgazer.js"></script>
 </head>
 <body>
 
-<div id="canvas-container">
-  <canvas id="drawing-canvas"></canvas>
-  <div id="gaze-cursor"></div>
+  <canvas id="network-bg"></canvas>
 
-  <div id="hud">
-    <div class="status-pill" id="mode-indicator">⬤ STOPPED</div>
-    <div class="status-pill" id="voice-status">🎤 Voice: off</div>
+  <div id="vitals-bar" style="display: none;">
+    <div class="vital">
+      <span class="vital-label">Heart Rate</span>
+      <span class="vital-value" id="vital-hr">72 <small>bpm</small></span>
+    </div>
+    <div class="vital">
+      <span class="vital-label">Blood Pressure</span>
+      <span class="vital-value" id="vital-bp">120/80 <small>mmHg</small></span>
+    </div>
+    <div class="vital">
+      <span class="vital-label">Oxygen Sat.</span>
+      <span class="vital-value" id="vital-o2">98 <small>%</small></span>
+    </div>
+    <div class="vital">
+      <span class="vital-label">Temperature</span>
+      <span class="vital-value" id="vital-temp">98.6 <small>°F</small></span>
+    </div>
+    <div class="vital">
+      <span class="vital-label">Status</span>
+      <span class="vital-value" id="nurse-status">All Clear</span>
+    </div>
+    <div class="vital" style="flex: 0 0 auto; border: none; padding-right: 32px;">
+      <button class="top-dashboard-btn" onclick="switchView('nurse-dashboard-view')">NURSE DASHBOARD</button>
+    </div>
   </div>
 
-  <div id="voice-toast"></div>
-</div>
+  <div id="login-view" class="view active">
+    
+    <div id="diagnostics-ticker">
+      <span class="ticker-label">SYS_CHK:</span> <span id="ticker-text">Initializing boot sequence...</span>
+    </div>
 
-<!-- Swap these two lines when merging eye tracking -->
-<script src="mock_vision.js"></script>
-<!-- <script src="real_gaze.js"></script> -->
+    <div class="login-wrapper animate-entrance">
+      <div class="login-image animate-fade">
+        <div class="login-image-overlay">
+          <h2>EyeSpeak Patient Portal</h2>
+          <p>Empowering communication for non-verbal patients through advanced gaze-tracking technology.</p>
+        </div>
+      </div>
+      <div class="login-form-container">
+        <div class="login-header stagger-1">
+          <h1>Welcome Back</h1>
+          <p>Please sign in to access your dashboard.</p>
+        </div>
+        <form id="dummy-login-form" onsubmit="handleLogin(event)">
+          <div class="input-group stagger-2">
+            <label for="patient-id">Patient ID / Username</label>
+            <input type="text" id="patient-id" placeholder="Enter your ID" required>
+          </div>
+          <div class="input-group stagger-3">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter password" required>
+          </div>
+          
+          <div class="button-group stagger-4">
+            <button type="submit" class="login-submit-btn">Secure Login</button>
+            <button type="button" class="demo-login-btn" onclick="runDemoLogin(event)">Demo Login (Guest)</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
-<script src="canvas.js"></script>
-<script src="voice.js"></script>
+  <div id="calibration-view" class="view">
+    <button class="skip-btn" onclick="skipCalibration()">Skip Calibration</button>
+    <div class="cal-instructions">
+      <p class="cal-title">Eye Calibration</p>
+      <p class="cal-sub">Look directly at each dot and click it 5 times</p>
+    </div>
+    <button class="cal-dot" id="pt1" style="top:20%;left:10%;" onclick="calibrateDot('pt1')"></button>
+    <button class="cal-dot" id="pt2" style="top:20%;left:50%;" onclick="calibrateDot('pt2')"></button>
+    <button class="cal-dot" id="pt3" style="top:20%;left:90%;" onclick="calibrateDot('pt3')"></button>
+    <button class="cal-dot" id="pt4" style="top:50%;left:10%;" onclick="calibrateDot('pt4')"></button>
+    <button class="cal-dot" id="pt5" style="top:50%;left:50%;" onclick="calibrateDot('pt5')"></button>
+    <button class="cal-dot" id="pt6" style="top:50%;left:90%;" onclick="calibrateDot('pt6')"></button>
+    <button class="cal-dot" id="pt7" style="top:80%;left:10%;" onclick="calibrateDot('pt7')"></button>
+    <button class="cal-dot" id="pt8" style="top:80%;left:50%;" onclick="calibrateDot('pt8')"></button>
+    <button class="cal-dot" id="pt9" style="top:80%;left:90%;" onclick="calibrateDot('pt9')"></button>
+  </div>
 
+  <div id="home-view" class="view">
+    <button class="gaze-btn side-nav" onclick="switchView('read-view')">READ</button>
+
+    <div class="center-panel">
+      <p class="panel-label">Quick Requests</p>
+      <div class="prompt-grid">
+        <button class="gaze-btn prompt-btn" onclick="speak('I need water')">Water</button>
+        <button class="gaze-btn prompt-btn" onclick="speak('I need food')">Food</button>
+        <button class="gaze-btn prompt-btn" onclick="speak('I am in pain')">Pain</button>
+        <button class="gaze-btn prompt-btn" onclick="speak('I am too cold')">Too Cold</button>
+        <button class="gaze-btn prompt-btn" onclick="speak('I am too hot')">Too Hot</button>
+        <button class="gaze-btn prompt-btn" onclick="speak('I need bathroom assistance')">Bathroom</button>
+      </div>
+      <button class="gaze-btn nurse-btn" onclick="callNurse()">Call Nurse</button>
+    </div>
+
+    <button class="gaze-btn side-nav" onclick="switchView('draw-view')">DRAW</button>
+  </div>
+
+  <div id="read-view" class="view">
+    <button class="gaze-btn side-nav" onclick="switchView('home-view')">HOME</button>
+
+    <div class="center-panel">
+      <div id="book-selection">
+        <p class="panel-label">Library</p>
+          <div class="book-grid">
+            <button class="gaze-btn book-btn" onclick="openBook('Sir Reginald', 0)">
+              <span class="book-title-text">Sir Reginald's Missing Sock</span>
+              <span class="book-author">A. Corgi</span>
+            </button>
+            <button class="gaze-btn book-btn" onclick="openBook('Spaghetti Monster', 1)">
+              <span class="book-title-text">The Great Spaghetti Monster</span>
+              <span class="book-author">Chef Boyardee</span>
+            </button>
+            <button class="gaze-btn book-btn" onclick="openBook('Space Fluff', 2)">
+              <span class="book-title-text">Captain Fluff's Space Adventure</span>
+              <span class="book-author">A. Hamster</span>
+            </button>
+            <button class="gaze-btn book-btn" onclick="openBook('Burping Frog', 3)">
+              <span class="book-title-text">Mystery of the Burping Frog</span>
+              <span class="book-author">Swampy Pete</span>
+            </button>
+            <button class="gaze-btn book-btn" onclick="openBook('Giant Pigeons', 4)">
+              <span class="book-title-text">Attack of the Giant Pigeons</span>
+              <span class="book-author">Bread Crumb</span>
+            </button>
+            <button class="gaze-btn book-btn" onclick="openBook('Forgetful Squirrel', 5)">
+              <span class="book-title-text">The Forgetful Squirrel</span>
+              <span class="book-author">Nutty Professor</span>
+            </button>
+          </div>
+      </div>
+
+      <div id="book-content" style="display:none;">
+        <div class="book-header">
+          <button class="gaze-btn back-btn" onclick="closeBook()">Back to Library</button>
+          <p class="panel-label" id="book-title-display"></p>
+        </div>
+        <div class="page-text-container">
+          <p id="page-text"></p>
+        </div>
+        <div class="page-controls">
+          <button class="gaze-btn page-btn" onclick="prevPage()">Previous Page</button>
+          <span class="page-num" id="page-num">Page 1</span>
+          <button class="gaze-btn page-btn" onclick="nextPage()">Next Page</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="gaze-btn side-nav" onclick="switchView('home-view')">HOME</button>
+  </div>
+
+  <div id="draw-view" class="view">
+    <button class="gaze-btn side-nav" onclick="switchView('home-view')">HOME</button>
+
+    <div class="draw-panel">
+      <p class="panel-label">Drawing Canvas</p>
+      <canvas id="gaze-canvas"></canvas>
+      <div class="draw-controls">
+        <button id="toggle-draw-btn" class="gaze-btn draw-ctrl-btn" onclick="toggleDrawing()">Start Drawing</button>
+        <button class="gaze-btn draw-ctrl-btn danger-btn" onclick="clearCanvas()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="nurse-dashboard-view" class="view">
+    <div class="dashboard-panel">
+      <div class="dashboard-header">
+        <div>
+          <h2 style="color: var(--primary); font-size: 24px;">Provider Activity Log</h2>
+          <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Real-time patient requests and telemetry</p>
+        </div>
+        <button class="back-btn" onclick="switchView('home-view')">Return to Patient View</button>
+      </div>
+      <div class="log-container" id="log-container">
+        <div class="empty-log" style="text-align: center; color: var(--text-muted); margin-top: 40px; font-weight: 500;">
+          Monitoring active. No activity logged yet.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js" defer></script>
 </body>
 </html>

@@ -1,0 +1,786 @@
+:root {
+  /* 🔱 UCSD Official Theme Palette */
+  --primary:        #182B49; /* UCSD Navy Dark */
+  --primary-hover:  #0c1626; /* Deepest Navy */
+  --secondary:      #00629B; /* UCSD Blue (vibrant) */
+  --accent:         #FFCD00; /* UCSD Gold */
+  
+  --bg:             #f0f4f8; /* Soft slate/blueish grey */
+  --surface:        #ffffff;
+  --surface-hover:  #f8fafc;
+  
+  --text-dark:      #182B49; /* Navy text */
+  --text-muted:     #4a6080;
+  --text-light:     #ffffff;
+  
+  --danger:         #ef4444;
+  --danger-dim:     #fef2f2;
+  --success:        #10b981; 
+  
+  --dwell-bg:       rgba(0, 98, 155, 0.06); /* Faint UCSD Blue tint */
+  --vitals-h:       68px;
+  --cam-w:          160px;
+  --cam-h:          120px;
+  
+  /* Soft UI Shadows */
+  --shadow-sm:      0 1px 3px rgba(24, 43, 73, 0.08);
+  --shadow-md:      0 4px 6px -1px rgba(24, 43, 73, 0.1), 0 2px 4px -1px rgba(24, 43, 73, 0.06);
+  --shadow-hover:   0 10px 15px -3px rgba(24, 43, 73, 0.1), 0 4px 6px -2px rgba(24, 43, 73, 0.05);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: radial-gradient(circle at top left, #e8f0f7 0%, #f0f4f8 40%, #e2e8f0 100%);
+  color: var(--text-dark);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* ── Vitals Bar ─────────────────────────────────────────────── */
+#vitals-bar {
+  height: var(--vitals-h);
+  display: flex;
+  align-items: stretch;
+  background: linear-gradient(90deg, var(--primary), var(--primary-hover));
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  position: relative;
+  z-index: 10;
+  border-bottom: 3px solid var(--accent); /* Solid gold underline */
+}
+
+.vital {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 24px;
+  border-right: 1px solid rgba(255,255,255,0.08);
+}
+
+.vital:last-child { border-right: none; }
+
+.vital-label {
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent); /* Gold labels */
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.vital-value {
+  font-family: 'DM Mono', monospace;
+  font-size: 20px;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.vital-value small {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  font-weight: 400;
+}
+
+#nurse-status { color: var(--success); font-weight: 700;}
+#nurse-status.alert { color: var(--danger); }
+
+/* ── Views ──────────────────────────────────────────────────── */
+.view {
+  display: none;
+  height: calc(100vh - var(--vitals-h));
+  width: 100vw;
+}
+
+.view.active { display: flex; }
+
+/* ── Gaze Buttons (Redesigned) ──────────────────────────────── */
+.gaze-btn {
+  background: var(--surface);
+  color: var(--text-dark);
+  border: 2px solid transparent; 
+  border-radius: 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.gaze-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--secondary);
+}
+
+.gaze-btn.dwelling {
+  background: var(--dwell-bg);
+  border-color: var(--secondary);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* THICKER, GOLD LOADING BAR */
+.gaze-btn.dwelling::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 8px; 
+  background: var(--accent); /* Glowing Gold */
+  box-shadow: 0 -2px 10px rgba(255, 205, 0, 0.6); 
+  animation: dwell-fill 1.5s linear forwards;
+}
+
+@keyframes dwell-fill {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+/* ── Side Nav (Sleek UCSD Gradient) ─────────────────────────── */
+.side-nav {
+  width: 120px;
+  min-width: 120px;
+  height: 100%;
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: white;
+  border-radius: 0;
+  background: linear-gradient(180deg, var(--secondary), var(--primary)); /* UCSD Blue down to Navy */
+  writing-mode: vertical-lr;
+  text-orientation: mixed;
+  border: none;
+}
+
+.side-nav:hover {
+  filter: brightness(1.2);
+  border: none;
+}
+
+/* ── Center Panel ───────────────────────────────────────────── */
+.center-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 32px 48px;
+  overflow: hidden;
+}
+
+.panel-label {
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+/* ── Prompt Grid ────────────────────────────────────────────── */
+.prompt-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 24px;
+  flex: 1;
+}
+
+.prompt-btn {
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Nurse Button ───────────────────────────────────────────── */
+.nurse-btn {
+  width: 100%;
+  height: 80px;
+  font-size: 18px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 700;
+  background: var(--danger-dim);
+  border: 2px solid rgba(239, 68, 68, 0.3);
+  color: var(--danger);
+  border-radius: 16px;
+  flex-shrink: 0;
+}
+
+.nurse-btn:hover { background: rgba(239, 68, 68, 0.15); border-color: var(--danger); }
+.nurse-btn.active { background: var(--danger); color: white; }
+
+/* ── Book Grid ───────────────────────── */
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 24px;
+  flex: 1;
+}
+
+.book-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 32px;
+  min-height: 140px;
+  gap: 8px;
+}
+
+.book-title-text { font-size: 22px; font-weight: 700; color: var(--text-dark); line-height: 1.2; }
+.book-author { font-size: 14px; color: var(--secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;}
+
+.book-btn:hover .book-title-text { color: var(--secondary); }
+
+/* ── Book Reader ────────────────────────────────────────────── */
+#book-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.book-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 4px;
+}
+
+.book-header .panel-label { margin-bottom: 0; }
+
+.back-btn {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 12px 24px;
+  color: var(--secondary);
+  background: var(--surface);
+  border-radius: 8px;
+}
+
+.back-btn:hover { background: var(--secondary); color: white; }
+
+.page-text-container {
+  flex: 1;
+  overflow: auto;
+  padding: 56px; /* Increased padding to give the text breathing room */
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+#page-text {
+  font-size: 36px; /* Massive readability boost (was 24px) */
+  line-height: 1.6;
+  font-weight: 500; /* Slightly bolder to pop against the white background */
+  color: var(--text-dark);
+  max-width: 900px; /* Prevents the lines of text from stretching too wide */
+  margin: 0 auto; /* Centers the text block perfectly */
+}
+
+.page-controls {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-shrink: 0;
+}
+
+.page-btn {
+  padding: 16px 32px;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 12px;
+  background: var(--primary);
+  color: white;
+}
+
+.page-btn:hover { background: var(--secondary); }
+
+.page-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  color: var(--text-muted);
+  flex: 1;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* ── Draw View ──────────────────────────────────────────────── */
+.draw-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 32px;
+  gap: 20px;
+}
+
+#gaze-canvas {
+  flex: 1;
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+  cursor: crosshair;
+  display: block;
+  width: 100%;
+}
+
+.draw-controls {
+  display: flex;
+  gap: 20px;
+  flex-shrink: 0;
+  height: 80px;
+}
+
+.draw-ctrl-btn {
+  flex: 7;
+  font-size: 16px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border-radius: 16px;
+  background: var(--primary);
+  color: white;
+}
+
+.draw-ctrl-btn:hover { background: var(--secondary); }
+
+.danger-btn {
+  background: var(--danger-dim);
+  color: var(--danger);
+  flex: 3;
+}
+
+.danger-btn:hover { background: rgba(239, 68, 68, 0.15); border-color: transparent; }
+
+/* ── Calibration View ───────────────────────────────────────── */
+#calibration-view {
+  position: relative;
+  flex-direction: column;
+}
+
+.cal-instructions {
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.cal-title {
+  font-size: 18px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--secondary);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.cal-sub {
+  font-size: 16px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.skip-btn {
+  position: absolute;
+  top: 32px;
+  right: 32px;
+  z-index: 10;
+  padding: 12px 28px;
+  background: var(--surface);
+  color: var(--text-muted);
+  border: none;
+  box-shadow: var(--shadow-sm);
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  pointer-events: auto; 
+}
+
+.skip-btn:hover {
+  background: var(--secondary);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.cal-dot {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: var(--secondary);
+  border: none;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition: transform 0.1s, opacity 0.2s, background 0.2s;
+  z-index: 2;
+  box-shadow: 0 0 0 6px rgba(0, 98, 155, 0.2);
+}
+
+.cal-dot:hover { transform: translate(-50%, -50%) scale(1.5); background: var(--accent); }
+.cal-dot.done { background: var(--text-muted); transform: translate(-50%, -50%) scale(0.5); pointer-events: none; box-shadow: none; opacity: 0.3; }
+
+/* ── Login View ─────────────────────────────────────────────── */
+#login-view {
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.login-wrapper {
+  display: flex;
+  background: var(--surface);
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(24, 43, 73, 0.15);
+  overflow: hidden;
+  width: 1000px;
+  max-width: 95%;
+  height: 550px;
+}
+
+.login-image {
+  flex: 1;
+  background: url('https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=800&q=80') center/cover no-repeat;
+  position: relative;
+}
+
+.login-image-overlay {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(transparent, rgba(24, 43, 73, 0.95)); /* Navy overlay */
+  padding: 40px;
+  color: white;
+}
+
+.login-image-overlay h2 { font-size: 28px; margin-bottom: 12px; }
+.login-image-overlay p { font-size: 16px; opacity: 0.9; line-height: 1.5; }
+
+.login-form-container {
+  flex: 1;
+  padding: 60px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-header h1 {
+  color: var(--primary);
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.login-header p {
+  color: var(--text-muted);
+  font-size: 16px;
+  margin-bottom: 32px;
+}
+
+.input-group {
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.input-group input {
+  padding: 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  color: var(--text-dark);
+  transition: all 0.2s;
+  background: #f8fafc;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: var(--secondary);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(0, 98, 155, 0.1);
+}
+
+.login-submit-btn {
+  width: 100%;
+  padding: 18px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 16px;
+}
+
+.login-submit-btn:hover { background: var(--secondary); }
+
+/* ── WebGazer Video ─────────────────────────── */
+#webgazerVideoContainer {
+  position: fixed !important;
+  top: calc(var(--vitals-h) + 16px) !important;
+  left: 16px !important;
+  bottom: auto !important;
+  right: auto !important;
+  width: 140px !important;
+  height: 105px !important;
+  border: 3px solid var(--secondary) !important; /* UCSD Blue border */
+  border-radius: 12px !important;
+  z-index: 9999 !important;
+  opacity: 0.8 !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+#webgazerVideoFeed {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+#webgazerVideoCanvas {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+#webgazerFaceOverlay, #webgazerFaceFeedbackBox { display: none !important; }
+
+
+/* ── Top Dashboard Button ───────────────────────────────────── */
+.top-dashboard-btn {
+  background: var(--surface);
+  color: var(--primary);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.2s;
+}
+
+.top-dashboard-btn:hover {
+  background: var(--accent);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+/* ── Nurse Dashboard View (Mouse-Friendly) ──────────────────── */
+.dashboard-panel {
+  flex: 1;
+  background: var(--surface);
+  margin: 32px 48px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.dashboard-header {
+  padding: 24px 32px;
+  border-bottom: 2px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+}
+
+.log-container {
+  flex: 1;
+  padding: 24px 32px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--bg);
+}
+
+.log-card {
+  padding: 16px 24px;
+  background: var(--surface);
+  border-left: 6px solid var(--secondary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  box-shadow: var(--shadow-sm);
+  animation: slide-in 0.3s ease-out;
+}
+
+.log-card.emergency {
+  border-left-color: var(--danger);
+  background: var(--danger-dim);
+}
+
+.log-time {
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  width: 100px;
+  flex-shrink: 0;
+}
+
+.log-message {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-dark);
+  flex: 1;
+}
+
+.log-card.emergency .log-message {
+  color: var(--danger);
+}
+
+.log-vitals-snapshot {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  color: var(--text-muted);
+  background: #f1f5f9;
+  padding: 8px 16px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ── WOW FACTOR: Particle Background ────────────────────────── */
+#network-bg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 0; /* Keeps it behind everything */
+  pointer-events: none; /* Allows you to click through it */
+}
+
+/* Ensure the login components sit above the background */
+.login-wrapper, #diagnostics-ticker {
+  position: relative;
+  z-index: 10; 
+}
+
+/* ── WOW FACTOR: Diagnostics Ticker ────────────────────────── */
+#diagnostics-ticker {
+  position: absolute;
+  bottom: 24px;
+  left: 32px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--secondary);
+  background: rgba(255, 255, 255, 0.8);
+  padding: 6px 12px;
+  border-radius: 4px;
+  border-left: 2px solid var(--accent);
+  box-shadow: var(--shadow-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.ticker-label {
+  color: var(--primary);
+  font-weight: 700;
+  margin-right: 8px;
+}
+
+#ticker-text {
+  animation: pulse-text 1.5s infinite;
+}
+
+@keyframes pulse-text {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ── WOW FACTOR: Staggered Entrance Animations ──────────────── */
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.login-submit-btn { margin-top: 0; } /* Reset margin since we use gap now */
+
+.demo-login-btn {
+  width: 100%;
+  padding: 16px;
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.demo-login-btn:hover {
+  background: rgba(24, 43, 73, 0.05); /* Very subtle navy hover */
+}
+
+/* Keyframes for the elegant slide-up reveal */
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-entrance {
+  animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade {
+  opacity: 0;
+  animation: fade-in 1s ease-out 0.4s forwards;
+}
+
+.stagger-1 { opacity: 0; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards; }
+.stagger-2 { opacity: 0; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards; }
+.stagger-3 { opacity: 0; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards; }
+.stagger-4 { opacity: 0; animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards; }
